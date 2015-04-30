@@ -14,12 +14,24 @@ var Mouse = {};
      * @param {HTMLElement} element
      * @return {mouse} A new mouse
      */
-    Mouse.create = function(element) {
+    Mouse.create = function(element, options) {
         var mouse = {};
+
+        // options may be passed as the first (and only) argument
+        options = Common.isElement(element) ? options : element;
+        element = Common.isElement(element) ? element : null;
 
         if (!element) {
             Common.log('Mouse.create: element was undefined, defaulting to document.body', 'warn');
         }
+
+        var defaults = {
+            enabledEvents: {
+                mousewheel: true
+            }
+        };
+
+        mouse.options = Common.extend(defaults, options);
         
         mouse.element = element || document.body;
         mouse.absolute = { x: 0, y: 0 };
@@ -116,8 +128,10 @@ var Mouse = {};
         element.addEventListener('mousedown', mouse.mousedown);
         element.addEventListener('mouseup', mouse.mouseup);
         
-        element.addEventListener("mousewheel", mouse.mousewheel);
-        element.addEventListener("DOMMouseScroll", mouse.mousewheel);
+        if (enabledEvents.mousewheel) {
+          element.addEventListener("mousewheel", mouse.mousewheel);
+          element.addEventListener("DOMMouseScroll", mouse.mousewheel);
+        }
 
         element.addEventListener('touchmove', mouse.mousemove);
         element.addEventListener('touchstart', mouse.mousedown);
